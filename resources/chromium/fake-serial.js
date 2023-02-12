@@ -328,7 +328,12 @@ class FakeSerialService {
     this.receiver_ = new SerialServiceReceiver(this);
     this.clients_ = [];
     this.nextToken_ = 0;
+    this.interfaceName_ = SerialService.$interfaceName;
     this.reset();
+  }
+
+  interfaceName() {
+    return this.interfaceName_;
   }
 
   start() {

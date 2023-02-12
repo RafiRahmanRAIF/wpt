@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+<script src="/resources/testdriver.js"></script>
+<script src="/resources/testdriver-vendor.js"></script>
+
+<body>
+  <button>Fake user gesture</button>
+</body>
+
+<script>
+  let interceptor;
+  test_driver.set_test_context(parent);
+
+  window.onmessage = messageEvent => {
+    switch (messageEvent.data.type) {
+      // SetupBinding will transfer mojo interface handle to the parent and
+      // complete the binding with parent's fakeSerialService.
+      case 'SetupBinding':
+        interceptor =
+            new MojoInterfaceInterceptor(messageEvent.data.interfaceName);
+        interceptor.oninterfacerequest = (e) => {
+          window.parent.postMessage(
+              {type: 'Attach', handle: e.handle}, '*', [e.handle]);
+        };
+        interceptor.start();
+        // Make a call to getPorts() to complete to ensure that the interface
+        // handle has been bound to the parent context.
+        navigator.serial.getPorts().then(() => {
+          window.parent.postMessage({type: 'Ready'}, '*');
+        });
+        break;
+      case 'GetPorts':
+        navigator.serial.getPorts()
+            .then(ports => parent.postMessage('Success', '*'))
+            .catch(err => parent.postMessage(`FAIL: ${err}`, '*'));
+        break;
+      case 'RequestPort':
+        test_driver.click(document.getElementsByTagName('button')[0])
+            .then(() => navigator.serial.requestPort({filters: []}))
+            .then(port => parent.postMessage('Success', '*'))
+            .catch(err => parent.postMessage(`FAIL: ${err}`, '*'));
+        break;
+      default:
+        parent.postMessage(`FAIL: Bad message type: ${messageEvent.data}`, '*');
+    };
+  };
+</script>
