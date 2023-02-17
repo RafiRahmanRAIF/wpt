@@ -20,7 +20,7 @@ promise_test(async t => {
   let navigatesuccess_called = false;
   navigation.onnavigatesuccess = t.step_func(() => {
     navigatesuccess_called = true;
-    assert_equals(window.scrollY, 0);
+    assert_not_equals(window.scrollY, 0);
   });
 
   let back_promises = navigation.back();
@@ -43,6 +43,6 @@ promise_test(async t => {
   await back_promises.finished;
   assert_equals(window.scrollY, 0);
   assert_true(navigatesuccess_called);
-}, "scroll: after-transition should scroll when back completes, just before navigatesuccess");
+}, "scroll: after-transition should scroll when back completes, just after navigatesuccess");
 </script>
 </body>
