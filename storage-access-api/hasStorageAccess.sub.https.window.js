@@ -1,7 +1,7 @@
 // META: script=helpers.js
 'use strict';
 
-const {expectAccessAllowed, testPrefix, topLevelDocument} = processQueryParams();
+const {testPrefix, topLevelDocument} = processQueryParams();
 
 // Common tests to run in all frames.
 test(() => {
@@ -10,8 +10,12 @@ test(() => {
 
 promise_test(async () => {
   const hasAccess = await document.hasStorageAccess();
-  assert_equals(hasAccess, expectAccessAllowed, "Access should be granted by default: " + expectAccessAllowed);
-}, "[" + testPrefix + "] document.hasStorageAccess() should be allowed by default: " + expectAccessAllowed);
+  if (topLevelDocument) {
+    assert_equals(hasAccess, true, "Access should be granted by default in top-level frame.");
+  } else {
+    assert_equals(hasAccess, false, "Access should not be granted by default in iframe.");
+  }
+}, "[" + testPrefix + "] document.hasStorageAccess() should not be allowed by default unless in top-level frame.");
 
 promise_test(async (t) => {
   const description = "Promise should reject when called on a generated document not part of the DOM.";

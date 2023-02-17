@@ -44,10 +44,10 @@ promise_test(
       await test_driver.set_permission(
           {name: 'storage-access'}, 'granted');
 
-      await RunCallbackWithGesture(() => document.requestStorageAccess());
+      await document.requestStorageAccess();
     },
     '[' + testPrefix +
-        '] document.requestStorageAccess() should be resolved when called properly with a user gesture');
+        '] document.requestStorageAccess() should be resolved with no user gesture when a permission grant exists');
 
 if (testPrefix == 'cross-origin-frame' || testPrefix == 'nested-cross-origin-frame') {
   promise_test(
